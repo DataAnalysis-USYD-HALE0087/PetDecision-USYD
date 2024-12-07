@@ -1,0 +1,87 @@
+---
+title: "Project 2: Individual"
+author: "Hai Chau Le - SID: 530328265"
+date: "University of Sydney | Data1001 | 17/9/2023 | Project2: Individual"
+output:
+  html_document:
+    fig_caption: yes
+    number_sections: no
+    self_contained: yes
+    theme: flatly
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: hide
+---
+
+```{r, message = F}
+#install necessary library
+library(tidyverse)
+library(readr)
+
+```
+
+```{r, message=FALSE}
+#import and read dataframe
+my_data <- read.csv("mydata.csv")
+male_data <- read.csv("male.csv")
+female_data <- read.csv("female.csv")
+```
+
+# Research Question: Which gender would spend a larger portion of their free time for their pets?
+
+```{r}
+ggplot(my_data, aes(y= Time.spent.with.pets , x = hours.of.freetime, col = gender)) +
+geom_point() + 
+  geom_point(aes(y = mean(male_data$Time.spent.with.pets), x = mean(male_data$hours.of.freetime)), color = "blue", size = 5) +
+  geom_point(aes(y = mean(female_data$Time.spent.with.pets), x = mean(female_data$hours.of.freetime)), color = "red", size = 5) +
+  geom_smooth(method = "lm", formula = "y ~ x") + ylab("The hours spend with pets (hours/week)") + xlab("Free time(hours/ week)") + labs(title = "The relation between free time and time spent with pets")
+```
+```{r}
+L1 <- lm(male_data$Time.spent.with.pets ~ male_data$hours.of.freetime) #lm(y ~ x)
+line_of_male = L1$coefficients
+cor_of_male = round(cor(male_data$Time.spent.with.pets, male_data$hours.of.freetime), 2)
+cor_of_male
+line_of_male
+
+L2 <- lm(female_data$Time.spent.with.pets ~ female_data$hours.of.freetime) #lm(y ~ x)
+line_of_female = L2$coefficients
+cor_of_female = round(cor(female_data$Time.spent.with.pets, female_data$hours.of.freetime), 2)
+cor_of_female
+line_of_female
+
+```
+Male:
+\[\text{Correlation of male} = 0.49      \text{                   (Moderate Positive Correlation)}\]
+
+\[y_1 = 0.172x + 8.973      \text{                   (where x = Free time per week and y = Time spent with pets per week)}\]
+
+Female
+\[\text{Correlation of female} = 0.69      \text{                   (Moderate Positive Correlation)}\]
+
+
+\[y_2 = 0.560x - 0.113      \text{                   (where x = Free time per week and y = Time spent with pets per week)}\]
+
+From the two equations above, we can see that both have a moderate correlation.
+
+
+
+
+```{r}
+
+line = lm(Time.spent.with.pets ~ hours.of.freetime, data = female_data)
+
+ggplot(line, aes(x = .fitted, y = .resid)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype ="dashed", colour = "red") + ylab("Residual") + xlab("Hours of free time") + labs(title = "Residual graph of the female time with pets ~ free time linear model")
+
+ggplot(line, aes(x = .fitted, y = .resid)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype ="dashed", colour = "red") + ylab("Residual") + xlab("Hours of free time") + labs(title = "Residual graph of the male time with pets ~ free time linear model")
+```
+
+However, judging by the residual plots given here, the linear model is not a great fit as it is not homoscedastic. This might implies weak correlation or a limitation of our small data sample size. 
+
+
+# Conclude
+The slopes of male and female are different (0.172 and 0.560, respectively). From this, we can see that female participants would spend about 56% of their free time on their pets, significantly more than their male participants (17%). We may conclude that female pet owners value their time with their pets more.
